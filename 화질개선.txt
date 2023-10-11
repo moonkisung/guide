@@ -1,0 +1,54 @@
+- 가운데 네트워크는 noise를 입력으로 받아서 noise를 output으로 내보낸다.
+- low resolution -> high resolution (8K 까지 가능)
+
+- stable diffusion만 알아도 나머지 이해 가능
+- 확산은 원래 되돌리는 것이 불가능하지만 이의 역함수를 수학적으로 정의할 수 있으면 인공지능을 적용할 수 있다!
+
+- 이 이미지를 가우시안 노이즈로 만드는 과정을 수학적으로 정의
+1. 이미지에 가우시안 노이즈를 조금씩 추가한다(weight sum, default 1000 step) 
+2. 충분한 스텝이 되어서 노이즈가 추가된 이미지는 가우시안 노이즈와 다르지 않다는 것이 수학적 정의
+3. 이미지를 노이즈로 만드는 과정을 diffusion process (scheduler, 수학적으로 근사)
+4. 노이즈에서 이미지로 만드는 과정(역함수)을 sampling, inverse process
+5. 알파와 베타는 정해져있다.?? 
+6. 상수 스케쥴러 
+7. 한번에 가는 것이 힘들기 때문에 t -> t-1 에 대한 posterior 구함
+8. 모델을 1000번 돌려야함 (1000 -> 999, 999 -> 998, ...)
+9. x_0를 추측하는 것이 아니고 random한 t를 뽑아내서 그것에 대한 t-1을 추측할 수 있도록 학습하는 것이 diffusion process(초창기)
+10. xt-1도 분포에서 추출이 된 것으로 본다 -> 평균과 분산을 아웃풋으로 내보냄
+
+11. 입력은 random하게 들어오더라도 고정된 것을 예측해야 하지 않을까?
+-> DDPM
+12. x_t가 어떤 시점이든간에 x_0를 예측
+13. 네트워크가 이미지를 바로 뽑아내도록 하지 말고
+14. x_t는 우리가 정한 스케줄링의 노이즈 weighted sum을 통해 만들어짐
+15. 만들어지는 어떤 노이즈가 추가가 되는지 아이디어를 바꿈
+16. 요즘은 노이즈가 들어가면 노이즈가 나오도록 바뀜
+17. 노이즈를 어떻게 제거하면 x_0가 나오는지 예측
+18. 입실론 값만 알게 되면 x_0를 추측할 수 있다.
+19. loss function이 간단해져서 거대한 모델이라도 학습이 가능해짐
+20. network가 예측한 noise를 제거하면서 x_0으로 만들어짐
+21. 어떤 타임스텝이 나오든지 간데 noise를 추측하도록
+
+● epsilon?
+● 알파, 베타
+● 랜덤하는 이유?
+
+DDIM
+1. sampling이 문제다.
+2. 어떤 입력이 들어오든 간에 일정한 값이 나오도록 posterior를 재설계함
+3. sampling을 하지 않는다고 생각하면 됨
+4. step을 몇 번 건너뛰어도 훨씬 퀄리티가 좋은 이미지가 샘플링된다.
+5. 샘플링할때는 지우는 것이 효과적이다.
+
+
+Stable Diffusion
+1. 이미지 레벨에서 diffusion process를 진행할 필요없음
+2. autoencoder를 통해 이미지가 압축되서 나온 vector에 diffusion 진행
+3. cross attention: 정보 추가
+4. autoencoder는 pretrain 되었음
+5. latent space에서 진행되기 때문에 이미지에 대해 이해할 필요가 없음 
+6. 훨씬 학습속도가 빠름, inference도 빠름 (size가 줄었기 때문에)
+
+https://github.com/huggingface/diffusers/tree/main/src/diffusers
+https://github.com/kohya-ss/sd-scripts
+https://huggingface.co/stabilityai
